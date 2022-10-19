@@ -1,6 +1,6 @@
 - 👋 Hi, I’m @marcag3
 - 👀 I’m interested in structural, civil computation. Web development and helping my community
-- 🌱 I’m currently learning perfecting my understanding of clean code and reusable code architecture
+- 🌱 I’m currently perfecting my utilisation of clean code and reusable code architecture
 
 my email is mantoine3@gmail.com
 
