@@ -23,3 +23,36 @@ To view the errors on a filament form when creating test, you can access the err
             ->call('create');
 
         dd($page->instance()->getErrorBag());
+
+
+When possible, avoid using fillForm because the field's default won't be used. Prefers to mutate data in the creation process.
+
+        Forms\Components\Select::make('billing_address_id')
+                        ->hidden(fn (Get $get) => $get('client_id') === null)
+                        ->label('Adresse de facturation')
+                        ->searchable()
+                        ->preload()
+                        ->relationship(
+                            name: 'billingAddress',
+                            modifyQueryUsing: fn (Builder $query, Get $get) => $query->where('client_id', $get('client_id'))
+                        )
+                        ->getOptionLabelFromRecordUsing(fn (Address $address) => $address->fullAddress)
+                        ->getOptionLabelUsing(fn ($value): ?string => Address::withTrashed()->find($value)?->fullAddress)
+                        ->createOptionForm([
+                            Hidden::make('client_id')
+                                ->required(),
+                            ...AddressesRelationManager::getFormFieldsSchema(),
+                        ])
+                       -- ->createOptionAction(function (Action $action, Get $get) {
+                       --     return $action
+                       --         ->fillForm(fn (): array => [
+                       --             'client_id' => $get('client_id'),
+                       --         ])
+                       --         ->modalHeading('Créer une adresse de facturation');
+                       -- })
+                       ++ ->createOptionModalHeading('Créer une adresse de facturation')
+                       ++ ->createOptionUsing(fn (array $data, Get $get): int => Address::create([
+                       ++     ...$data,
+                       ++     Address::CLIENT_ID => $get('client_id'),
+                       ++ ])->getKey())
+                        ->required()
